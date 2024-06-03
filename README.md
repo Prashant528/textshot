@@ -15,7 +15,9 @@ This tool gives users the ability to take a screenshot and copy to the clipboard
 
 Running `textshot.py` with `python`/`python3` will open an overlay over the screen, where a rectangle can be drawn over the portion of the screen containing the text the user wishes to copy.
 
-An optional command line argument can specify the language. For example, `python textshot.py eng+fra` will use English as the primary language and French as the secondary language. The default is `eng` (English). Make sure that the appropriate data files for Tesseract are installed for other languages. A list of all supported languages can be found [here](https://github.com/tesseract-ocr/tesseract/blob/master/doc/tesseract.1.asc#languages-and-scripts).
+Additionally, you can now use `textshot.py` to process an image file directly. To do this, provide the path to the image file as an argument when running the script. For example, `python textshot.py --file path/to/image.png` will process the specified image and output the detected text.
+
+An optional command line argument can specify the language for OCR processing. For example, `python textshot.py --lang eng+fra` will use English as the primary language and French as the secondary language when processing an image file or a screenshot. The default is `eng` (English). Make sure that the appropriate data files for Tesseract are installed for other languages. A list of all supported languages can be found [here](https://github.com/tesseract-ocr/tesseract/blob/master/doc/tesseract.1.asc#languages-and-scripts).
 
 It is recommended to attach a global hotkey to this tool so you can run it without opening a console and typing in the command.
 
