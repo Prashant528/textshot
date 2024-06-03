@@ -2,6 +2,7 @@
 
 import io
 import sys
+import argparse
 
 import pyperclip
 import pytesseract
@@ -80,16 +81,19 @@ class Snipper(QtWidgets.QWidget):
         QtWidgets.QApplication.quit()
 
 
-def processImage(img):
-    buffer = QtCore.QBuffer()
-    buffer.open(QtCore.QBuffer.ReadWrite)
-    img.save(buffer, "PNG")
-    pil_img = Image.open(io.BytesIO(buffer.data()))
-    buffer.close()
+def processImage(img, file_path=None):
+    if file_path:
+        img = Image.open(file_path)
+    else:
+        buffer = QtCore.QBuffer()
+        buffer.open(QtCore.QBuffer.ReadWrite)
+        img.save(buffer, "PNG")
+        img = Image.open(io.BytesIO(buffer.data()))
+        buffer.close()
 
     try:
         result = pytesseract.image_to_string(
-            pil_img, timeout=5, lang=(sys.argv[1] if len(sys.argv) > 1 else None)
+            img, timeout=5, lang=(sys.argv[1] if len(sys.argv) > 1 else None)
         ).strip()
     except RuntimeError as error:
         print(f"ERROR: An error occurred when trying to process the image: {error}")
@@ -103,6 +107,10 @@ def processImage(img):
     else:
         print(f"INFO: Unable to read text from image, did not copy")
         notify(f"Unable to read text from image, did not copy")
+
+
+def processImageFromFile(file_path):
+    processImage(None, file_path)
 
 
 def notify(msg):
@@ -120,6 +128,11 @@ def notify(msg):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='TextShot: Capture text from your screen or an image file.')
+    parser.add_argument('--file', type=str, help='Path to an image file to process.')
+    parser.add_argument('--lang', type=str, default='eng', help='Language for OCR processing.')
+    args = parser.parse_args()
+
     QtCore.QCoreApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
     app = QtWidgets.QApplication(sys.argv)
     try:
@@ -135,7 +148,10 @@ if __name__ == "__main__":
         )
         sys.exit()
 
-    window = QtWidgets.QMainWindow()
-    snipper = Snipper(window)
-    snipper.show()
-    sys.exit(app.exec_())
+    if args.file:
+        processImageFromFile(args.file)
+    else:
+        window = QtWidgets.QMainWindow()
+        snipper = Snipper(window)
+        snipper.show()
+        sys.exit(app.exec_())
